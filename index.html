@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grade 9 - I Wish I Could Make It Better Assessment Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#6C5CE7',
+                            pink: '#FD79A8',
+                            yellow: '#FFEAA7',
+                            green: '#00B894',
+                            orange: '#E17055',
+                            blue: '#0984E3',
+                            dark: '#2D3436',
+                            light: '#F8F9FA'
+                        }
+                    },
+                    boxShadow: {
+                        'fun': '0 8px 0px 0px rgba(0, 0, 0, 0.15)',
+                        'fun-sm': '0 4px 0px 0px rgba(0, 0, 0, 0.15)',
+                        'fun-lg': '0 12px 0px 0px rgba(0, 0, 0, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F3F4F6;
+            background-image: radial-gradient(#6C5CE7 0.75px, transparent 0.75px), radial-gradient(#FD79A8 0.75px, #F3F4F6 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            user-select: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-bounce-gentle {
+            animation: bounce-gentle 2s infinite ease-in-out;
+        }
+
+        .pulse-red {
+            animation: pulse-red-anim 1s infinite alternate;
+        }
+        @keyframes pulse-red-anim {
+            0% { background-color: #ef4444; color: #ffffff; }
+            100% { background-color: #fee2e2; color: #dc2626; }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between antialiased selection:bg-purple-300 selection:text-purple-900">
+
+    <script>
+        /********************************************************************************
+         * TEACHER CONFIGURATION SECTION
+         * Insert your Google Apps Script Web App URL below between the single quotes.
+         * Example: const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+         ********************************************************************************/
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz71Uz8GFUfk_C0qu95QErgPm5R3FwNvXtN38jhr4l14UHKW71wFKRIi5mVyQEFdVio/exec"; // <-- PASTE YOUR GOOGLE APPS SCRIPT URL HERE!
+        
+        // Passcode configuration
+        const SYSTEM_PASSCODE = "SMP2026";
+    </script>
+
+    <!-- Navigation Header -->
+    <header class="bg-white border-b-4 border-slate-900 sticky top-0 z-30 px-4 py-3 shadow-md">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-purple flex items-center justify-center text-white text-xl font-black shadow-fun-sm border-2 border-slate-900">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-black tracking-wide text-slate-800 leading-tight">ENGLISH GRADE 9 ASSESSMENT</h1>
+                    <p class="text-xs font-bold text-brand-purple">Fase D • Unit 2: I Wish I Could Make It Better</p>
+                </div>
+            </div>
+
+            <!-- Quiz Timer & Status (Visible only during exam) -->
+            <div id="header-status-bar" class="hidden flex items-center gap-3">
+                <div class="bg-amber-100 border-2 border-slate-900 rounded-xl px-3 py-1.5 flex items-center space-x-2 shadow-fun-sm">
+                    <i class="fa-solid fa-clock text-amber-600 text-lg"></i>
+                    <div>
+                        <span class="text-[10px] uppercase font-black text-amber-700 block -mb-1">Time Left</span>
+                        <span id="timer-display" class="font-black text-base md:text-lg text-slate-800">60:00</span>
+                    </div>
+                </div>
+
+                <!-- Cheating Counter Header -->
+                <div id="violation-badge" class="bg-red-100 border-2 border-slate-900 rounded-xl px-3 py-1.5 flex items-center space-x-2 shadow-fun-sm">
+                    <i class="fa-solid fa-triangle-exclamation text-red-600 text-lg"></i>
+                    <div>
+                        <span class="text-[10px] uppercase font-black text-red-700 block -mb-1">Violations</span>
+                        <span id="header-violation-count" class="font-black text-base text-red-600">0 / 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Script Guide Button -->
+            <button onclick="openTeacherModal()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-2 border-slate-900 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-fun-sm">
+                <i class="fa-solid fa-code text-indigo-600"></i>
+                <span>GAS Guide for Teacher</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto w-full p-4 flex-grow flex flex-col justify-center my-4">
+
+        <!-- ================= SCREEN 1: LOGIN / START SCREEN ================= -->
+        <div id="screen-welcome" class="max-w-2xl mx-auto w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 shadow-fun-lg relative overflow-hidden">
+            <!-- Decorative Banner elements -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-yellow rounded-full border-4 border-slate-900 -z-0"></div>
+            <div class="absolute -bottom-10 -left-10 w-28 h-28 bg-brand-pink rounded-full border-4 border-slate-900 -z-0"></div>
+
+            <div class="relative z-10">
+                <div class="text-center mb-6">
+                    <span class="inline-block px-4 py-1.5 bg-brand-yellow border-2 border-slate-900 rounded-full text-xs font-black uppercase tracking-wider text-slate-900 shadow-fun-sm mb-3">
+                        <i class="fa-solid fa-star mr-1"></i> Formative Assessment Unit 2
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-slate-800 tracking-tight">I Wish I Could Make It Better! ✉️</h2>
+                    <p class="text-sm md:text-base text-slate-600 font-medium mt-1">Expressing Wishes, Regrets & Personal Letters (30 Questions)</p>
+                </div>
+
+                <!-- Guidelines Card -->
+                <div class="bg-blue-50 border-2 border-slate-900 rounded-2xl p-4 mb-6 shadow-fun-sm text-xs md:text-sm text-slate-700">
+                    <h3 class="font-black text-slate-900 uppercase tracking-wide flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-circle-info text-brand-blue"></i> Rules & Guidelines:
+                    </h3>
+                    <ul class="space-y-1.5 list-disc list-inside font-medium text-slate-700">
+                        <li>Total Duration: <span class="font-bold text-slate-900">60 Minutes</span>.</li>
+                        <li>Question Count: <span class="font-bold text-slate-900">30 Questions</span> (Multiple Choice).</li>
+                        <li>Topics: Expressing Wishes/Regrets, Personal Letter Structures, and Contextual Analysis.</li>
+                        <li><span class="font-bold text-red-600"><i class="fa-solid fa-shield-cat"></i> Anti-Cheating Active:</span> Leaving this window is tracked. Maximum <span class="font-bold text-red-600">3 violations</span> will reset your session.</li>
+                    </ul>
+                </div>
+
+                <!-- Registration Form -->
+                <form id="login-form" onsubmit="handleStartExam(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Student Full Name <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="input-student-name" required placeholder="e.g. Maya Putri" 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Class / Grade <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-school"></i>
+                                </span>
+                                <select id="input-student-class" required class="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                                    <option value="" disabled selected>Select Class...</option>
+                                    <option value="Class 9A">Class 9A</option>
+                                    <option value="Class 9B">Class 9B</option>
+                                    <option value="Class 9C">Class 9C</option>
+                                    <option value="Class 9D">Class 9D</option>
+                                    <option value="Class 9E">Class 9E</option>
+                                    <option value="Class 9F">Class 9F</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-extrabold text-slate-700 uppercase mb-1">Assessment Passcode <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-key"></i>
+                                </span>
+                                <input type="password" id="input-passcode" required placeholder="Enter Passcode..." 
+                                    class="w-full pl-10 pr-10 py-3 bg-slate-50 border-2 border-slate-900 rounded-xl font-bold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-purple-200 transition">
+                                <button type="button" onclick="togglePasscodeVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-800">
+                                    <i id="passcode-eye-icon" class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="login-error-msg" class="hidden p-3 bg-red-100 border-2 border-red-500 rounded-xl text-red-700 text-xs font-bold text-center">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> Incorrect Passcode! Please ask your teacher.
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-brand-green hover:bg-emerald-500 text-white font-black text-lg border-4 border-slate-900 rounded-2xl shadow-fun transition transform active:translate-y-1 active:shadow-none flex items-center justify-center gap-2">
+                        <span>START ASSESSMENT</span>
+                        <i class="fa-solid fa-circle-play"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- ================= SCREEN 2: EXAM SCREEN ================= -->
+        <div id="screen-exam" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Side / Main Quiz Area (8 cols) -->
+            <div class="lg:col-span-8 space-y-4">
+                
+                <!-- Main Card -->
+                <div class="bg-white border-4 border-slate-900 rounded-3xl p-5 md:p-7 shadow-fun-lg relative">
+                    
+                    <!-- Question Header & Badges -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-slate-200 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span id="question-number-badge" class="px-3 py-1 bg-brand-purple text-white font-black rounded-xl text-sm border-2 border-slate-900 shadow-fun-sm">
+                                Q #1
+                            </span>
+                            <span id="question-level-badge" class="px-2.5 py-1 bg-emerald-100 text-emerald-800 border-2 border-emerald-800 font-bold rounded-xl text-xs">
+                                Easy
+                            </span>
+                            <span id="question-topic-badge" class="hidden md:inline-block px-2.5 py-1 bg-slate-100 text-slate-700 border-2 border-slate-800 font-bold rounded-xl text-xs">
+                                Expressing Wishes
+                            </span>
+                        </div>
+
+                        <!-- Mark for Review Checkbox Button -->
+                        <button type="button" id="btn-toggle-doubt" onclick="toggleDoubtState()" class="px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 transition">
+                            <i id="doubt-icon" class="fa-regular fa-bookmark text-amber-700"></i>
+                            <span id="doubt-text">Mark for Review</span>
+                        </button>
+                    </div>
+
+                    <!-- Question Content Area -->
+                    <div id="question-box" class="space-y-4">
+                        <!-- Reading Passage / Dialogue Box -->
+                        <div id="passage-container" class="bg-slate-50 border-2 border-slate-900 rounded-2xl p-4 text-slate-800 text-sm md:text-base leading-relaxed font-medium relative">
+                            <span class="absolute -top-3 left-4 bg-brand-pink text-white border-2 border-slate-900 px-2 py-0.5 rounded-md text-[10px] font-black uppercase">
+                                Passage / Dialogue
+                            </span>
+                            <div id="passage-text" class="mt-1 whitespace-pre-line font-medium">Loading text...</div>
+                        </div>
+
+                        <!-- Question Image Placeholder -->
+                        <div id="question-image-box" class="hidden my-3 text-center">
+                            <img id="question-image" src="" alt="Question Image" class="max-h-60 mx-auto rounded-xl border-2 border-slate-900 shadow-fun-sm object-cover" onerror="this.classList.add('hidden')">
+                        </div>
+
+                        <!-- Question Prompt -->
+                        <p id="question-prompt" class="font-extrabold text-base md:text-lg text-slate-900 pt-1">
+                            Question text here?
+                        </p>
+
+                        <!-- Answer Options Grid -->
+                        <div id="options-container" class="space-y-3 pt-2">
+                            <!-- Dynamically populated options A, B, C, D -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Navigation Controls -->
+                    <div class="flex items-center justify-between gap-2 border-t-2 border-slate-200 pt-5 mt-6">
+                        <button id="btn-prev" onclick="goToPrevQuestion()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Previous</span>
+                        </button>
+
+                        <button id="btn-next" onclick="goToNextQuestion()" class="px-5 py-2.5 bg-brand-purple hover:bg-indigo-600 text-white font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition">
+                            <span>Next</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                        <button id="btn-finish-exam" onclick="confirmSubmitExam()" class="hidden px-5 py-2.5 bg-brand-green hover:bg-emerald-600 text-white font-extrabold rounded-xl border-2 border-slate-900 shadow-fun-sm text-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Submit All</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Side / Question Palette Grid (4 cols) -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="bg-white border-4 border-slate-900 rounded-3xl p-5 shadow-fun-lg">
+                    <h3 class="font-black text-slate-800 text-base mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-grip mr-1 text-brand-purple"></i> Question Palette</span>
+                        <span id="answered-count-badge" class="text-xs bg-purple-100 text-purple-800 px-2.5 py-1 rounded-lg border border-purple-300 font-bold">0 / 30</span>
+                    </h3>
+
+                    <!-- Status Legend -->
+                    <div class="grid grid-cols-3 gap-1.5 mb-4 text-[11px] font-bold">
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-slate-200 border border-slate-600 inline-block"></span>
+                            <span>Unanswered</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 border border-slate-900 inline-block"></span>
+                            <span>Answered</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-lg border border-slate-300">
+                            <span class="w-3 h-3 rounded-full bg-amber-400 border border-slate-900 inline-block"></span>
+                            <span>Review</span>
+                        </div>
+                    </div>
+
+                    <!-- Question Number Grid -->
+                    <div id="question-palette-grid" class="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto custom-scrollbar p-1">
+                        <!-- Populated dynamically 1 to 30 -->
+                    </div>
+
+                    <!-- Direct Submit Button -->
+                    <div class="mt-5 pt-3 border-t-2 border-slate-200">
+                        <button onclick="confirmSubmitExam()" class="w-full py-3 bg-brand-orange hover:bg-orange-600 text-white font-extrabold text-sm border-2 border-slate-900 rounded-xl shadow-fun-sm transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Finish Assessment</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ================= SCREEN 3: RESULT SCREEN ================= -->
+        <div id="screen-result" class="hidden max-w-3xl mx-auto w-full bg-white border-4 border-slate-900 rounded-3xl p-6 md:p-8 shadow-fun-lg">
+            
+            <div class="text-center mb-6">
+                <div id="result-icon-container" class="w-20 h-20 mx-auto rounded-2xl bg-amber-100 border-4 border-slate-900 flex items-center justify-center text-4xl mb-3 shadow-fun">
+                    🏆
+                </div>
+                <h2 id="result-title" class="text-3xl font-black text-slate-800">Assessment Complete!</h2>
+                <p id="result-subtitle" class="text-sm font-semibold text-slate-600 mt-1">Great job completing your Grade 9 English assessment.</p>
+            </div>
+
+            <!-- Score Summary Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="bg-purple-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-purple-700 block">Final Score</span>
+                    <span id="res-score" class="text-3xl font-black text-brand-purple">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">/ 100</span>
+                </div>
+
+                <div class="bg-emerald-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-emerald-700 block">Correct Answers</span>
+                    <span id="res-correct" class="text-3xl font-black text-emerald-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">questions</span>
+                </div>
+
+                <div class="bg-rose-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-rose-700 block">Wrong Answers</span>
+                    <span id="res-wrong" class="text-3xl font-black text-rose-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">questions</span>
+                </div>
+
+                <div class="bg-amber-50 border-2 border-slate-900 rounded-2xl p-3 text-center shadow-fun-sm">
+                    <span class="text-[11px] font-black uppercase text-amber-700 block">Violations</span>
+                    <span id="res-violations" class="text-3xl font-black text-amber-600">0</span>
+                    <span class="text-[10px] text-slate-500 font-bold block">tab switches</span>
+                </div>
+            </div>
+
+            <!-- Student Info Summary Bar -->
+            <div class="bg-slate-100 border-2 border-slate-900 rounded-xl p-3 mb-6 flex flex-wrap items-center justify-between text-xs font-bold gap-2">
+                <div><i class="fa-solid fa-user text-brand-purple mr-1"></i> Student: <span id="res-student-name" class="text-slate-900">Name</span></div>
+                <div><i class="fa-solid fa-school text-brand-blue mr-1"></i> Class: <span id="res-student-class" class="text-slate-900">Class</span></div>
+                <div><i class="fa-solid fa-clock text-amber-600 mr-1"></i> Time Taken: <span id="res-time-taken" class="text-slate-900">0m 0s</span></div>
+            </div>
+
+            <!-- GAS Status Bar -->
+            <div id="gas-status-card" class="mb-6 p-3 rounded-xl border-2 border-slate-900 text-xs font-bold flex items-center justify-between bg-blue-50 text-blue-800">
+                <span class="flex items-center gap-2">
+                    <i id="gas-spinner" class="fa-solid fa-spinner fa-spin"></i>
+                    <span id="gas-status-text">Submitting results to Google Sheets...</span>
+                </span>
+                <button id="gas-retry-btn" onclick="submitResultsToGAS()" class="hidden px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[11px] hover:bg-blue-700">Retry</button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col md:flex-row gap-3">
+                <button onclick="toggleReviewMode()" class="flex-1 py-3 bg-brand-blue hover:bg-blue-600 text-white font-extrabold rounded-2xl border-2 border-slate-900 shadow-fun-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass font-black"></i>
+                    <span id="btn-review-text">Review Questions & Answers</span>
+                </button>
+                <button onclick="resetAppToStart()" class="py-3 px-6 bg-slate-800 hover:bg-slate-900 text-white font-extrabold rounded-2xl border-2 border-slate-900 shadow-fun-sm transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Back to Home</span>
+                </button>
+            </div>
+
+            <!-- Review Panel Section (Hidden by default) -->
+            <div id="review-panel" class="hidden mt-6 border-t-4 border-slate-900 pt-6 space-y-4">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-purple"></i> Question-by-Question Review
+                </h3>
+                <div id="review-items-container" class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t-2 border-slate-900 py-3 text-center text-xs font-bold text-slate-500">
+        Grade 9 English Assessment Game • Kurikulum Merdeka (Fase D)
+    </footer>
+
+
+    <!-- ================= MODALS & POPUPS ================= -->
+    <!-- Cheating Warning Modal -->
+    <div id="modal-violation" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-md w-full shadow-fun-lg text-center animate-bounce-gentle">
+            <div class="w-16 h-16 mx-auto bg-red-100 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-red-600 text-3xl mb-4 shadow-fun-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-xl font-black text-red-600 uppercase">Warning: Cheating Detected!</h3>
+            <p class="text-sm font-medium text-slate-700 mt-2">
+                You switched tabs or left the assessment window. Leaving the assessment window is strictly forbidden!
+            </p>
+            <div class="my-4 p-3 bg-red-50 border-2 border-red-300 rounded-2xl">
+                <span class="text-xs font-extrabold text-red-700 block uppercase">Violation Counter</span>
+                <span id="modal-violation-count" class="text-2xl font-black text-red-600">1 / 3</span>
+            </div>
+            <p id="modal-violation-msg" class="text-xs text-slate-500 font-semibold mb-5">
+                Note: Reaching 3 violations will automatically invalidate your attempt and return to the main screen.
+            </p>
+            <button onclick="closeViolationModal()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-extrabold border-2 border-slate-900 rounded-xl shadow-fun-sm transition">
+                I Understand & Continue Test
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirm Submit Modal -->
+    <div id="modal-confirm-submit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-md w-full shadow-fun-lg text-center">
+            <div class="w-14 h-14 mx-auto bg-amber-100 border-4 border-slate-900 rounded-2xl flex items-center justify-center text-amber-600 text-2xl mb-3 shadow-fun-sm">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800">Submit Assessment?</h3>
+            <p id="modal-confirm-text" class="text-xs md:text-sm text-slate-600 font-medium mt-2">
+                Are you sure you want to finish? Make sure you have reviewed all your answers.
+            </p>
+            <div class="flex gap-3 mt-5">
+                <button onclick="closeConfirmModal()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-extrabold border-2 border-slate-900 rounded-xl text-xs transition">
+                    Keep Working
+                </button>
+                <button onclick="executeFinalSubmit()" class="flex-1 py-2.5 bg-brand-green hover:bg-emerald-600 text-white font-extrabold border-2 border-slate-900 rounded-xl text-xs shadow-fun-sm transition">
+                    Yes, Submit Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Guide & GAS Code Modal -->
+    <div id="modal-teacher" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-fun-lg">
+            <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3 mb-3">
+                <h3 class="font-black text-lg text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-file-code text-brand-purple"></i> Teacher Setup Guide: Google Apps Script
+                </h3>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-800 text-xl font-bold">&times;</button>
+            </div>
+
+            <div class="overflow-y-auto custom-scrollbar pr-2 space-y-4 text-xs text-slate-700 leading-relaxed flex-grow">
+                <div class="bg-amber-50 border border-amber-300 p-3 rounded-xl text-amber-800">
+                    <strong>Instructions:</strong>
+                    <ol class="list-decimal list-inside space-y-1 mt-1 font-medium">
+                        <li>Create a new <strong>Google Sheet</strong> in your Google Drive.</li>
+                        <li>Click <strong>Extensions &gt; Apps Script</strong>.</li>
+                        <li>Delete any existing code and paste the exact Google Apps Script code below into <code class="bg-amber-200 px-1 rounded">Code.gs</code>.</li>
+                        <li>Click <strong>Deploy &gt; New deployment</strong>.</li>
+                        <li>Select type: <strong>Web App</strong>. Set "Execute as": <strong>Me</strong>, and "Who has access": <strong>Anyone</strong>.</li>
+                        <li>Copy the generated <strong>Web App URL</strong> and paste it into the <code class="bg-amber-200 px-1 rounded">GAS_WEB_APP_URL</code> variable near line 25 of this HTML file!</li>
+                    </ol>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-extrabold uppercase text-slate-800">Google Apps Script Code (.gs)</span>
+                        <button onclick="copyGasCode()" class="px-2 py-1 bg-slate-800 text-white rounded text-[10px] font-bold hover:bg-slate-700">
+                            <i class="fa-solid fa-copy mr-1"></i> Copy Code
+                        </button>
+                    </div>
+                    <pre id="gas-script-code" class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto whitespace-pre">
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // Set up headers if empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Timestamp", 
+        "Nama", 
+        "Kelas", 
+        "Benar", 
+        "Salah", 
+        "Skor Akhir", 
+        "Jumlah Pelanggaran", 
+        "No Soal Salah"
+      ]);
+    }
+    
+    var data = JSON.parse(e.postData.contents);
+    
+    sheet.appendRow([
+      data.timestamp || new Date().toLocaleString(),
+      data.nama || "",
+      data.kelas || "",
+      data.benar || 0,
+      data.salah || 0,
+      data.skor || 0,
+      data.pelanggaran || 0,
+      data.noSoalSalah || "-"
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({"result": "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({"result": "error", "error": err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+                    </pre>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t-2 border-slate-200 text-right mt-3">
+                <button onclick="closeTeacherModal()" class="px-4 py-2 bg-slate-800 text-white font-extrabold rounded-xl text-xs">Close Guide</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= JAVASCRIPT APP ENGINE ================= -->
+    <script>
+        /* ================= QUESTION DATABASE (30 QUESTIONS - GRADE 9 UNIT 2) ================= */
+        const QUESTIONS = [
+            // --- Easy (1 - 10) LOTS ---
+            {
+                id: 1,
+                level: "Easy (LOTS)",
+                topic: "Expressing Wishes",
+                passage: "Dialogue:\nFajar: I failed the school basketball team selection yesterday.\nSiti: Oh, I'm sorry to hear that. I wish you _____ better luck in the next selection!",
+                prompt: "Choose the correct verb form to complete Siti's expression of wish.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "have", choiceImage: "" },
+                    { key: "B", text: "had", choiceImage: "" },
+                    { key: "C", text: "having", choiceImage: "" },
+                    { key: "D", text: "has", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "When expressing a present wish/desire for a situation to be different, 'wish + past tense (had)' is used."
+            },
+            {
+                id: 2,
+                level: "Easy (LOTS)",
+                topic: "Expressing Regrets",
+                passage: "Statement:\n'If only I had studied harder before the English exam, I would have gotten a higher grade.'",
+                prompt: "What does the sentence express?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "A future plan", choiceImage: "" },
+                    { key: "B", text: "A past regret", choiceImage: "" },
+                    { key: "C", text: "An invitation", choiceImage: "" },
+                    { key: "D", text: "A compliment", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'If only + past perfect' is a classic structure used to express regret about past actions."
+            },
+            {
+                id: 3,
+                level: "Easy (LOTS)",
+                topic: "Personal Letter",
+                passage: "Excerpt from a personal letter:\n'Dear Maya,\nHow are you doing? I hope you are feeling much better after your flu...'",
+                prompt: "Which part of a personal letter is 'Dear Maya'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Salutation / Greeting", choiceImage: "" },
+                    { key: "B", text: "Body of the letter", choiceImage: "" },
+                    { key: "C", text: "Complementary close", choiceImage: "" },
+                    { key: "D", text: "Postscript (P.S.)", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "'Dear Maya' opens the letter and serves as the salutation or greeting."
+            },
+            {
+                id: 4,
+                level: "Easy (LOTS)",
+                topic: "Personal Letter Structure",
+                passage: "Letter Structure List:\n1. Salutation\n2. Body\n3. Date & Address\n4. Closing & Signature\n5. Postscript (optional)",
+                prompt: "Where is the date usually placed in a formal personal letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "At the bottom right corner under the signature", choiceImage: "" },
+                    { key: "B", text: "At the top right or top left before the salutation", choiceImage: "" },
+                    { key: "C", text: "Inside the body paragraph", choiceImage: "" },
+                    { key: "D", text: "In the P.S. section", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The date in a personal letter is placed at the top (left or right) before the opening salutation."
+            },
+            {
+                id: 5,
+                level: "Easy (LOTS)",
+                topic: "Expressing Wishes",
+                passage: "Dialogue:\nRian: My family is moving to Semarang next month.\nDina: Really? I wish I _____ stay connected with you every single day!",
+                prompt: "Complete the sentence with the correct past continuous/modal form.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "can", choiceImage: "" },
+                    { key: "B", text: "could", choiceImage: "" },
+                    { key: "C", text: "will", choiceImage: "" },
+                    { key: "D", text: "may", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Wish + could' expresses ability or willingness desired in the present or future."
+            },
+            {
+                id: 6,
+                level: "Easy (LOTS)",
+                topic: "Personal Letter Purpose",
+                passage: "Text snippet:\n'P.S. Don't forget to bring your acoustic guitar when you visit my house next Sunday!'",
+                prompt: "What does 'P.S.' stand for in a letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Personal Statement", choiceImage: "" },
+                    { key: "B", text: "Postscript", choiceImage: "" },
+                    { key: "C", text: "Please Send", choiceImage: "" },
+                    { key: "D", text: "Primary Section", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "P.S. stands for 'Postscript', an additional note added after the signature."
+            },
+            {
+                id: 7,
+                level: "Easy (LOTS)",
+                topic: "Expressing Regrets",
+                passage: "Dialogue:\nBudi: Did you go to the school concert last night?\nLaras: No, I didn't. I wish I _____ gone, but I had to finish my science project.",
+                prompt: "Which option correctly fills the blank?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "have", choiceImage: "" },
+                    { key: "B", text: "had", choiceImage: "" },
+                    { key: "C", text: "would", choiceImage: "" },
+                    { key: "D", text: "was", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "To express regret about not attending an event in the past: 'I wish I had gone'."
+            },
+            {
+                id: 8,
+                level: "Easy (LOTS)",
+                topic: "Personal Letter Closing",
+                passage: "Letter snippet:\n'...I really hope to see you soon during the holiday.\nWarmest regards,\nNadia'",
+                prompt: "The phrase 'Warmest regards' is an example of a:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Greeting", choiceImage: "" },
+                    { key: "B", text: "Complementary close", choiceImage: "" },
+                    { key: "C", text: "Address", choiceImage: "" },
+                    { key: "D", text: "Main subject line", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Warmest regards' is a standard friendly sign-off or complementary close in personal letters."
+            },
+            {
+                id: 9,
+                level: "Easy (LOTS)",
+                topic: "Expressing Wishes",
+                passage: "Sentence:\n'I wish today _____ Sunday so I could sleep all day long.'",
+                prompt: "Select the correct subjunctive verb form for 'to be' in modern subjunctive expressions.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "is", choiceImage: "" },
+                    { key: "B", text: "were", choiceImage: "" },
+                    { key: "C", text: "are", choiceImage: "" },
+                    { key: "D", text: "been", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "In formal subjunctive grammar for wishes, 'were' is used for all subjects ('I wish today were...')."
+            },
+            {
+                id: 10,
+                level: "Easy (LOTS)",
+                topic: "Personal Letter Context",
+                passage: "Dialogue:\nAndi: Who are you writing that letter to, Tari?\nTari: To my former classmate, Sinta, who moved to Jakarta. I want to tell her about our class trip to Jogja.",
+                prompt: "What is Tari's main purpose in writing the letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "To invite Sinta to buy a new camera.", choiceImage: "" },
+                    { key: "B", text: "To share news about their recent class trip.", choiceImage: "" },
+                    { key: "C", text: "To ask Sinta for loan money.", choiceImage: "" },
+                    { key: "D", text: "To complain about her school teacher.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Tari explicitly states she wants to tell Sinta about their class trip to Jogja (sharing news)."
+            },
+
+            // --- Medium (11 - 20) LOTS / HOTS ---
+            {
+                id: 11,
+                level: "Medium (LOTS)",
+                topic: "Expressing Wishes & Hope",
+                passage: "Comparison:\nSentence 1: 'I hope you pass the test tomorrow.'\nSentence 2: 'I wish I were a bird so I could fly.'",
+                prompt: "What is the key difference between 'hope' and 'wish' in these contexts?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "'Hope' is for impossible desires; 'wish' is for realistic future plans.", choiceImage: "" },
+                    { key: "B", text: "'Hope' expresses attainable future outcomes; 'wish' expresses imaginary or unreal present desires.", choiceImage: "" },
+                    { key: "C", text: "Both words mean the exact same thing with no grammatical difference.", choiceImage: "" },
+                    { key: "D", text: "'Hope' always uses past perfect tense.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Hope' indicates realistic/achievable future possibilities, whereas 'wish' expresses hypothetical/unreal situations."
+            },
+            {
+                id: 12,
+                level: "Medium (HOTS)",
+                topic: "Personal Letter Analysis",
+                passage: "Read the letter:\n'Jl. Pemuda No. 12, Surabaya\n10 October 2026\n\nDear Kiki,\n\nI was deeply saddened to hear about the passing of your grandfather. He was such a kind man who always welcomed us with hot cocoa whenever we studied at your house.\n\nPlease accept my sincere condolences. If you need someone to talk to or just want to go for a walk, I am always here for you.\n\nYour true friend,\nAris'",
+                prompt: "What is the main tone and intention of Aris's letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Cheerful and celebratory; congratulating Kiki.", choiceImage: "" },
+                    { key: "B", text: "Sympathetic and supportive; expressing condolences.", choiceImage: "" },
+                    { key: "C", text: "Apologetic; asking for forgiveness for an error.", choiceImage: "" },
+                    { key: "D", text: "Persuasive; convincing Kiki to move to Surabaya.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The letter expresses sorrow for Kiki's grandfather and offers comfort ('sincere condolences'), making the tone sympathetic."
+            },
+            {
+                id: 13,
+                level: "Medium (LOTS)",
+                topic: "Expressing Regrets",
+                passage: "Dialogue:\nEdo: Why are you so tired today, Galang?\nGalang: I stayed up until 2 AM playing mobile games. I wish I _____ to bed earlier last night!",
+                prompt: "Fill in the blank with the appropriate structure.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "go", choiceImage: "" },
+                    { key: "B", text: "had gone", choiceImage: "" },
+                    { key: "C", text: "have gone", choiceImage: "" },
+                    { key: "D", text: "will go", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Expressing regret about staying up late last night requires 'wish + past perfect' (had gone)."
+            },
+            {
+                id: 14,
+                level: "Medium (HOTS)",
+                topic: "Inference from Personal Letter",
+                passage: "Text snippet:\n'Dear Aunt Sarah,\nThank you so much for the knitted sweater you sent for my 15th birthday! The purple color matches my favorite school bag perfectly. I wish you could have attended my small party, but I understand you were busy with work...'",
+                prompt: "What can we infer about Aunt Sarah from the letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "She forgot the sender's birthday.", choiceImage: "" },
+                    { key: "B", text: "She attended the birthday party in person.", choiceImage: "" },
+                    { key: "C", text: "She sent a thoughtful gift despite not being able to attend the party.", choiceImage: "" },
+                    { key: "D", text: "She dislikes the color purple.", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "The sender thanks Aunt Sarah for a knitted sweater gift and mentions 'I wish you could have attended', proving she sent a gift but missed the party."
+            },
+            {
+                id: 15,
+                level: "Medium (LOTS)",
+                topic: "Grammar: Wish vs Hope",
+                passage: "Read the sentences:\n1. 'I _____ you have a wonderful trip to Bali next week.'\n2. 'I _____ I knew how to play the piano like a professional.'",
+                prompt: "Select the correct pair of words to complete sentences 1 and 2 respectively.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "1. hope | 2. wish", choiceImage: "" },
+                    { key: "B", text: "1. wish | 2. hope", choiceImage: "" },
+                    { key: "C", text: "1. wish | 2. wish", choiceImage: "" },
+                    { key: "D", text: "1. hope | 2. hope", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Sentence 1 expresses a realistic wish for someone's future trip (hope); Sentence 2 expresses an imaginary present ability (wish + past verb)."
+            },
+            {
+                id: 16,
+                level: "Medium (HOTS)",
+                topic: "Contextual Dialogue",
+                passage: "Dialogue:\nRia: Our science project display got wet because of the heavy rain near the open window.\nSiti: Oh no! If only we _____ the table away from the window yesterday afternoon!",
+                prompt: "Which option best completes Siti's expression of regret?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "move", choiceImage: "" },
+                    { key: "B", text: "had moved", choiceImage: "" },
+                    { key: "C", text: "will move", choiceImage: "" },
+                    { key: "D", text: "are moving", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'If only + had moved' reflects a past regret about not moving the table yesterday."
+            },
+            {
+                id: 17,
+                level: "Medium (LOTS)",
+                topic: "Personal Letter Components",
+                passage: "Letter snippet:\n'I must wrap up now because it's getting late and I have an early class tomorrow morning. Write back to me as soon as you can!'",
+                prompt: "This paragraph is located in which part of a personal letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Salutation", choiceImage: "" },
+                    { key: "B", text: "Closing paragraph", choiceImage: "" },
+                    { key: "C", text: "Heading / Address", choiceImage: "" },
+                    { key: "D", text: "Subject line", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Phrases like 'I must wrap up now' and 'Write back to me' signal the closing paragraph before signing off."
+            },
+            {
+                id: 18,
+                level: "Medium (HOTS)",
+                topic: "Expressing Wishes",
+                passage: "Situation:\nBagas lives in a small apartment in the city center. He loves dogs, but the apartment building strictly prohibits keeping pets.",
+                prompt: "Which sentence best expresses Bagas's situation using 'wish'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Bagas wishes he keeps a pet dog in his apartment.", choiceImage: "" },
+                    { key: "B", text: "Bagas wishes his apartment allowed pets so he could keep a dog.", choiceImage: "" },
+                    { key: "C", text: "Bagas hopes he dislikes dogs.", choiceImage: "" },
+                    { key: "D", text: "Bagas wishes he doesn't live near dogs.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Bagas desires a different reality (apartment allowing pets), so 'wishes his apartment allowed pets' correctly reflects his desire."
+            },
+            {
+                id: 19,
+                level: "Medium (LOTS)",
+                topic: "Personal Letter Conventions",
+                passage: "Question on informal vs formal language in personal letters.",
+                prompt: "Which of the following phrases is most appropriate for an informal personal letter to a peer?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Dear Sir/Madam,", choiceImage: "" },
+                    { key: "B", text: "I am writing to formally request information regarding...", choiceImage: "" },
+                    { key: "C", text: "Hey Leo, guess what happened yesterday!", choiceImage: "" },
+                    { key: "D", text: "Yours faithfully,", choiceImage: "" }
+                ],
+                answerKey: "C",
+                explanation: "'Hey Leo, guess what happened yesterday!' uses warm, conversational language suitable for an informal personal letter."
+            },
+            {
+                id: 20,
+                level: "Medium (HOTS)",
+                topic: "Expressing Regrets & Remedies",
+                passage: "Dialogue:\nDewi: I left my English textbook at home, so I couldn't follow Mr. Hendra's lesson properly.\nTania: If only you _____ your bag before leaving home this morning!",
+                prompt: "Complete the sentence with the appropriate verb form.",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "check", choiceImage: "" },
+                    { key: "B", text: "had checked", choiceImage: "" },
+                    { key: "C", text: "will check", choiceImage: "" },
+                    { key: "D", text: "checking", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'If only + had checked' expresses regret about an action forgotten earlier that morning."
+            },
+
+            // --- Hard (21 - 30) HOTS ---
+            {
+                id: 21,
+                level: "Hard (HOTS)",
+                topic: "Personal Letter Text Analysis",
+                passage: "Read the letter below:\n'Bandung, 14 September 2026\n\nDear Farah,\n\nIt's been a while since we last spoke! I'm writing this letter to apologize for missing your dance recital last Saturday. My younger brother suddenly came down with a high fever, and my parents needed me to stay home and look after him while they took him to the clinic.\n\nI wish I could have been in the audience to cheer for you. I heard from Rizky that your solo performance was breathtaking!\n\nLet's grab a smoothie this Friday after school. My treat!\n\nLove,\nChitradewi'",
+                prompt: "Why did Chitradewi write the letter to Farah?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "To invite Farah to perform at her brother's birthday party.", choiceImage: "" },
+                    { key: "B", text: "To apologize for missing Farah's dance recital and explain the urgent reason.", choiceImage: "" },
+                    { key: "C", text: "To complain about her younger brother's high fever.", choiceImage: "" },
+                    { key: "D", text: "To ask Farah to pay for their Friday smoothies.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "The core purpose stated in the letter is 'to apologize for missing your dance recital' due to a family emergency."
+            },
+            {
+                id: 22,
+                level: "Hard (HOTS)",
+                topic: "Deep Text Inference",
+                passage: "Based on Chitradewi's letter in Question #21:\n'I wish I could have been in the audience to cheer for you. I heard from Rizky that your solo performance was breathtaking!'",
+                prompt: "What does Chitradewi mean by using 'I wish I could have been in the audience'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "She actually attended the performance and cheered loudly.", choiceImage: "" },
+                    { key: "B", text: "She regrets being unable to watch the recital in person.", choiceImage: "" },
+                    { key: "C", text: "She plans to perform on stage in the next dance recital.", choiceImage: "" },
+                    { key: "D", text: "She dislikes watching dance recitals in general.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "'Wish + could have + past participle' conveys past regret over an unfulfilled desire (she was absent and regrets missing it)."
+            },
+            {
+                id: 23,
+                level: "Hard (HOTS)",
+                topic: "Grammar & Meaning Synthesis",
+                passage: "Scenario:\nReza did not practice his guitar solo for the talent show. During the live performance, he made several mistakes and felt embarrassed.",
+                prompt: "Which pair of sentences correctly represents Reza's regret and present wish?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Regret: 'I wish I had practiced more.' | Present Wish: 'I wish I were more confident on stage now.'", choiceImage: "" },
+                    { key: "B", text: "Regret: 'I wish I practice more.' | Present Wish: 'I wish I am more confident on stage now.'", choiceImage: "" },
+                    { key: "C", text: "Regret: 'I hope I had practiced.' | Present Wish: 'I hope I was confident.'", choiceImage: "" },
+                    { key: "D", text: "Regret: 'If only I practice.' | Present Wish: 'If only I am confident.'", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Past regret requires 'wish + had + V3' (had practiced) and present wish requires 'wish + subjunctive past' (were)."
+            },
+            {
+                id: 24,
+                level: "Hard (HOTS)",
+                topic: "Personal Letter Reconstruction",
+                passage: "Jumbled Sections of a Personal Letter:\n(1) With love, Maya\n(2) Dear Uncle Tom,\n(3) Thank you for the birthday gift!\n(4) I wish you could visit us next summer.\n(5) Jakarta, 12 October 2026",
+                prompt: "What is the correct logical order for these letter components?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "(5) -> (2) -> (3) -> (4) -> (1)", choiceImage: "" },
+                    { key: "B", text: "(2) -> (5) -> (4) -> (3) -> (1)", choiceImage: "" },
+                    { key: "C", text: "(5) -> (3) -> (2) -> (1) -> (4)", choiceImage: "" },
+                    { key: "D", text: "(1) -> (2) -> (3) -> (4) -> (5)", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Correct order: Date/Place (5) -> Salutation (2) -> Opening/Body (3) -> Wish/Closing (4) -> Complementary close & Signature (1)."
+            },
+            {
+                id: 25,
+                level: "Hard (HOTS)",
+                topic: "Contextual Wish Identification",
+                passage: "Dialogue:\nMr. Bowie: How is your English speech presentation preparation going, Kevin?\nKevin: Honestly, I feel nervous. I don't have a broad vocabulary yet.\nMr. Bowie: Don't worry. Keep practicing in front of the mirror.",
+                prompt: "What wish would Kevin most likely make regarding his situation?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "I wish I had a richer vocabulary to deliver a smooth speech.", choiceImage: "" },
+                    { key: "B", text: "I wish Mr. Bowie canceled the whole English class forever.", choiceImage: "" },
+                    { key: "C", text: "I hope I fail the speech competition tomorrow.", choiceImage: "" },
+                    { key: "D", text: "I wish I didn't have any mirrors at home.", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Kevin's concern is his limited vocabulary, so wishing for a richer vocabulary directly addresses his challenge."
+            },
+            {
+                id: 26,
+                level: "Hard (HOTS)",
+                topic: "Communicative Competence",
+                passage: "Read the situation:\nYour penpal from Australia, Hannah, wrote to tell you that her pet dog passed away after being sick for weeks.",
+                prompt: "Which response sentence in your reply letter shows the best empathy and proper use of 'wish/hope'?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "I wish you got a bigger and more expensive dog soon.", choiceImage: "" },
+                    { key: "B", text: "I am so sorry for your loss. I wish I could be there to give you a big hug and comfort you.", choiceImage: "" },
+                    { key: "C", text: "I hope you don't cry because dogs are just animals.", choiceImage: "" },
+                    { key: "D", text: "If only you bought a cat instead of a dog.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Option B combines heartfelt condolences with an empathetic wish ('I wish I could be there to give you a big hug')."
+            },
+            {
+                id: 27,
+                level: "Hard (HOTS)",
+                topic: "Comparative Text Analysis",
+                passage: "Letter A: 'I wish I had attended the study group yesterday. I missed the crucial explanation on math equations.'\nLetter B: 'I hope we can study together tomorrow afternoon so we can master the math equations before Friday.'",
+                prompt: "Analyze the core distinction between Letter A and Letter B:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Letter A expresses a past regret; Letter B expresses a constructive future goal.", choiceImage: "" },
+                    { key: "B", text: "Letter A is about a birthday party; Letter B is about a sports match.", choiceImage: "" },
+                    { key: "C", text: "Letter A uses formal business language; Letter B uses poetic language.", choiceImage: "" },
+                    { key: "D", text: "Both letters describe events that happened five years ago.", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Letter A looks backward at a missed opportunity (past regret), while Letter B looks forward to a actionable plan (future hope)."
+            },
+            {
+                id: 28,
+                level: "Hard (HOTS)",
+                topic: "Error Identification in Wishes",
+                passage: "Read the sentence:\n'I wish I am taller so that I could reach the top shelf in the school library.'",
+                prompt: "Identify the grammatical error and select the correct revision:",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "Change 'am' to 'were' -> 'I wish I were taller...'", choiceImage: "" },
+                    { key: "B", text: "Change 'could' to 'can' -> '...so that I can reach...'", choiceImage: "" },
+                    { key: "C", text: "Change 'wish' to 'hoping' -> 'I hoping I am...'", choiceImage: "" },
+                    { key: "D", text: "Change 'taller' to 'tallest' -> '...I am tallest...'", choiceImage: "" }
+                ],
+                answerKey: "A",
+                explanation: "Subjunctive 'wish' requires past tense/subjunctive 'were' ('I wish I were taller'), not present tense 'am'."
+            },
+            {
+                id: 29,
+                level: "Hard (HOTS)",
+                topic: "Reading Comprehension & Critical Thinking",
+                passage: "Short Personal Letter:\n'Dear Mom & Dad,\nBoarding school life is quite exciting, but I miss your home-cooked meals every night! If only the school cafeteria served spicy Rendang like Mom makes. I wish I could visit home this weekend, but our scout camp starts on Saturday.\nLove,\nDaffa'",
+                prompt: "What is Daffa's primary dilemma described in the letter?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "He wants to leave boarding school permanently because he dislikes scout camp.", choiceImage: "" },
+                    { key: "B", text: "He misses home and his mother's food, but cannot visit home due to scheduled scout camp.", choiceImage: "" },
+                    { key: "C", text: "He is angry at his parents for not sending him money.", choiceImage: "" },
+                    { key: "D", text: "He wants to learn how to cook Rendang at scout camp.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Daffa expresses homesickness ('miss home-cooked meals', 'wish I could visit home') but explains he cannot return because scout camp starts Saturday."
+            },
+            {
+                id: 30,
+                level: "Hard (HOTS)",
+                topic: "Synthesis & Expressive Writing",
+                passage: "Prompt Scenario:\nYour classmate, Sarah, was selected for the regional English debate competition, but she feels insecure about her pronunciation.",
+                prompt: "Which sentence in a encouragement note best integrates 'hope' and 'wish' appropriately?",
+                imageUrl: "",
+                options: [
+                    { key: "A", text: "I wish you didn't join the competition because debate is hard. I hope you quit now.", choiceImage: "" },
+                    { key: "B", text: "I wish you knew how talented you truly are! I hope you shine and win the trophy in the competition!", choiceImage: "" },
+                    { key: "C", text: "I hope you were better at debate last year. I wish you lost yesterday.", choiceImage: "" },
+                    { key: "D", text: "If only you quit school to practice debate day and night.", choiceImage: "" }
+                ],
+                answerKey: "B",
+                explanation: "Option B beautifully combines a present wish ('I wish you knew how talented you are!') with an uplifting future hope ('I hope you shine and win!')."
+            }
+        ];
+
+        /* ================= STATE MANAGEMENT ================= */
+        let currentState = {
+            studentName: "",
+            studentClass: "",
+            currentQuestionIndex: 0,
+            userAnswers: {},  // { questionId: 'A'|'B'|'C'|'D' }
+            doubtStatus: {},  // { questionId: true|false }
+            violationsCount: 0,
+            examStartTime: null,
+            examEndTime: null,
+            timerInterval: null,
+            remainingSeconds: 60 * 60, // 60 minutes
+            isExamActive: false,
+            reviewMode: false
+        };
+
+        /* ================= APPLICATION LIFECYCLE ================= */
+        window.addEventListener('DOMContentLoaded', () => {
+            setupAntiCheatingListeners();
+        });
+
+        // Toggle passcode input visibility
+        function togglePasscodeVisibility() {
+            const input = document.getElementById('input-passcode');
+            const icon = document.getElementById('passcode-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        /* ================= LOGIN & EXAM START ================= */
+        function handleStartExam(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('input-student-name').value.trim();
+            const classInput = document.getElementById('input-student-class').value;
+            const passcode = document.getElementById('input-passcode').value.trim();
+            const errorMsg = document.getElementById('login-error-msg');
+
+            if (passcode !== SYSTEM_PASSCODE) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            // Set state
+            currentState.studentName = nameInput;
+            currentState.studentClass = classInput;
+            currentState.currentQuestionIndex = 0;
+            currentState.userAnswers = {};
+            currentState.doubtStatus = {};
+            currentState.violationsCount = 0;
+            currentState.remainingSeconds = 60 * 60; // 60 min
+            currentState.isExamActive = true;
+            currentState.examStartTime = new Date();
+
+            // UI Switch
+            document.getElementById('screen-welcome').classList.add('hidden');
+            document.getElementById('screen-exam').classList.remove('hidden');
+            document.getElementById('header-status-bar').classList.remove('hidden');
+
+            // Render Palette & First Question
+            renderPaletteGrid();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        /* ================= TIMER CONTROLLER ================= */
+        function startTimer() {
+            clearInterval(currentState.timerInterval);
+            updateTimerDisplay();
+
+            currentState.timerInterval = setInterval(() => {
+                if (!currentState.isExamActive) return;
+
+                currentState.remainingSeconds--;
+                updateTimerDisplay();
+
+                if (currentState.remainingSeconds <= 0) {
+                    clearInterval(currentState.timerInterval);
+                    alert("Time's up! Your assessment will be submitted automatically.");
+                    executeFinalSubmit();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(currentState.remainingSeconds / 60);
+            const s = currentState.remainingSeconds % 60;
+            const formatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            const displayEl = document.getElementById('timer-display');
+            displayEl.textContent = formatted;
+
+            // Warning visual if time < 5 minutes
+            if (currentState.remainingSeconds <= 300) {
+                displayEl.parentElement.parentElement.classList.add('pulse-red');
+            } else {
+                displayEl.parentElement.parentElement.classList.remove('pulse-red');
+            }
+        }
+
+        /* ================= QUESTION RENDERING ENGINE ================= */
+        function renderQuestion(index) {
+            currentState.currentQuestionIndex = index;
+            const q = QUESTIONS[index];
+
+            // Badge updates
+            document.getElementById('question-number-badge').textContent = `Q #${index + 1} / ${QUESTIONS.length}`;
+            
+            const levelBadge = document.getElementById('question-level-badge');
+            levelBadge.textContent = q.level;
+            if (q.level.includes("Easy")) {
+                levelBadge.className = "px-2.5 py-1 bg-emerald-100 text-emerald-800 border-2 border-emerald-800 font-bold rounded-xl text-xs";
+            } else if (q.level.includes("Medium")) {
+                levelBadge.className = "px-2.5 py-1 bg-amber-100 text-amber-800 border-2 border-amber-800 font-bold rounded-xl text-xs";
+            } else {
+                levelBadge.className = "px-2.5 py-1 bg-rose-100 text-rose-800 border-2 border-rose-800 font-bold rounded-xl text-xs";
+            }
+
+            document.getElementById('question-topic-badge').textContent = q.topic;
+
+            // Doubt toggle status
+            updateDoubtButtonUI(q.id);
+
+            // Passage
+            const passageBox = document.getElementById('passage-container');
+            if (q.passage && q.passage.trim() !== "") {
+                document.getElementById('passage-text').innerText = q.passage;
+                passageBox.classList.remove('hidden');
+            } else {
+                passageBox.classList.add('hidden');
+            }
+
+            // Image
+            const imgBox = document.getElementById('question-image-box');
+            const imgEl = document.getElementById('question-image');
+            if (q.imageUrl && q.imageUrl.trim() !== "") {
+                imgEl.src = q.imageUrl;
+                imgBox.classList.remove('hidden');
+            } else {
+                imgBox.classList.add('hidden');
+            }
+
+            // Question prompt
+            document.getElementById('question-prompt').textContent = q.prompt;
+
+            // Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const selectedKey = currentState.userAnswers[q.id];
+
+            q.options.forEach(opt => {
+                const isSelected = (selectedKey === opt.key);
+                const optButton = document.createElement('button');
+                optButton.type = 'button';
+                optButton.onclick = () => selectOption(q.id, opt.key);
+
+                let btnStyle = "w-full text-left p-3.5 rounded-2xl border-2 font-semibold text-sm transition flex items-center justify-between gap-3 ";
+                if (isSelected) {
+                    btnStyle += "bg-purple-100 border-brand-purple text-brand-purple shadow-fun-sm font-extrabold";
+                } else {
+                    btnStyle += "bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-800";
+                }
+
+                optButton.className = btnStyle;
+
+                let optContent = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl border-2 ${isSelected ? 'bg-brand-purple text-white border-slate-900' : 'bg-white text-slate-700 border-slate-400'} flex items-center justify-center font-black text-xs shrink-0">
+                            ${opt.key}
+                        </span>
+                        <span class="leading-snug">${opt.text}</span>
+                    </div>
+                `;
+
+                if (opt.choiceImage && opt.choiceImage.trim() !== "") {
+                    optContent += `<img src="${opt.choiceImage}" alt="Choice image" class="h-10 w-10 object-cover rounded-lg border border-slate-400">`;
+                }
+
+                optButton.innerHTML = optContent;
+                optionsContainer.appendChild(optButton);
+            });
+
+            // Navigation Button Visibility
+            document.getElementById('btn-prev').disabled = (index === 0);
+            
+            if (index === QUESTIONS.length - 1) {
+                document.getElementById('btn-next').classList.add('hidden');
+                document.getElementById('btn-finish-exam').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-next').classList.remove('hidden');
+                document.getElementById('btn-finish-exam').classList.add('hidden');
+            }
+
+            updatePaletteItemHighlight(index);
+        }
+
+        /* ================= OPTION SELECTION ================= */
+        function selectOption(qId, key) {
+            if (!currentState.isExamActive) return;
+
+            currentState.userAnswers[qId] = key;
+            renderQuestion(currentState.currentQuestionIndex);
+            renderPaletteGrid();
+        }
+
+        /* ================= DOUBT / REVIEW TOGGLE ================= */
+        function toggleDoubtState() {
+            const qId = QUESTIONS[currentState.currentQuestionIndex].id;
+            currentState.doubtStatus[qId] = !currentState.doubtStatus[qId];
+            updateDoubtButtonUI(qId);
+            renderPaletteGrid();
+        }
+
+        function updateDoubtButtonUI(qId) {
+            const isDoubt = !!currentState.doubtStatus[qId];
+            const btn = document.getElementById('btn-toggle-doubt');
+            const icon = document.getElementById('doubt-icon');
+            const text = document.getElementById('doubt-text');
+
+            if (isDoubt) {
+                btn.className = "px-3 py-1 bg-amber-400 text-slate-900 font-black border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 shadow-fun-sm";
+                icon.className = "fa-solid fa-bookmark text-slate-900";
+                text.textContent = "Marked for Review";
+            } else {
+                btn.className = "px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border-2 border-slate-900 rounded-xl text-xs flex items-center gap-1.5 transition";
+                icon.className = "fa-regular fa-bookmark text-amber-700";
+                text.textContent = "Mark for Review";
+            }
+        }
+
+        /* ================= QUESTION PALETTE GRID ================= */
+        function renderPaletteGrid() {
+            const grid = document.getElementById('question-palette-grid');
+            grid.innerHTML = '';
+
+            let answeredCount = 0;
+
+            QUESTIONS.forEach((q, idx) => {
+                const isAnswered = !!currentState.userAnswers[q.id];
+                const isDoubt = !!currentState.doubtStatus[q.id];
+                const isCurrent = (idx === currentState.currentQuestionIndex);
+
+                if (isAnswered) answeredCount++;
+
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.onclick = () => renderQuestion(idx);
+
+                let classes = "h-10 rounded-xl border-2 text-xs font-black transition flex items-center justify-center relative shadow-fun-sm ";
+
+                if (isCurrent) {
+                    classes += "ring-4 ring-purple-300 ring-offset-1 ";
+                }
+
+                if (isDoubt) {
+                    classes += "bg-amber-400 text-slate-900 border-slate-900";
+                } else if (isAnswered) {
+                    classes += "bg-emerald-500 text-white border-slate-900";
+                } else {
+                    classes += "bg-slate-100 text-slate-700 border-slate-300 hover:border-slate-800";
+                }
+
+                item.className = classes;
+                item.textContent = idx + 1;
+
+                grid.appendChild(item);
+            });
+
+            document.getElementById('answered-count-badge').textContent = `${answeredCount} / ${QUESTIONS.length}`;
+        }
+
+        function updatePaletteItemHighlight(activeIndex) {
+            const items = document.getElementById('question-palette-grid').children;
+            for (let i = 0; i < items.length; i++) {
+                if (i === activeIndex) {
+                    items[i].classList.add('ring-4', 'ring-purple-300', 'ring-offset-1');
+                } else {
+                    items[i].classList.remove('ring-4', 'ring-purple-300', 'ring-offset-1');
+                }
+            }
+        }
+
+        /* ================= NEXT / PREVIOUS NAVIGATION ================= */
+        function goToNextQuestion() {
+            if (currentState.currentQuestionIndex < QUESTIONS.length - 1) {
+                renderQuestion(currentState.currentQuestionIndex + 1);
+            }
+        }
+
+        function goToPrevQuestion() {
+            if (currentState.currentQuestionIndex > 0) {
+                renderQuestion(currentState.currentQuestionIndex - 1);
+            }
+        }
+
+        /* ================= PROCTORING & ANTI-CHEATING ENGINE ================= */
+        function setupAntiCheatingListeners() {
+            window.addEventListener('blur', handleUserCheatingViolation);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    handleUserCheatingViolation();
+                }
+            });
+        }
+
+        function handleUserCheatingViolation() {
+            if (!currentState.isExamActive) return;
+
+            currentState.violationsCount++;
+            document.getElementById('header-violation-count').textContent = `${currentState.violationsCount} / 3`;
+            document.getElementById('modal-violation-count').textContent = `${currentState.violationsCount} / 3`;
+
+            if (currentState.violationsCount >= 3) {
+                // Max violations reached -> Reset session
+                alert("STRICT RULE VIOLATION: You left the exam window 3 times! Your assessment has been invalidated and reset.");
+                resetAppToStart();
+            } else {
+                // Show warning popup
+                document.getElementById('modal-violation').classList.remove('hidden');
+            }
+        }
+
+        function closeViolationModal() {
+            document.getElementById('modal-violation').classList.add('hidden');
+        }
+
+        /* ================= SUBMIT & RESULT LOGIC ================= */
+        function confirmSubmitExam() {
+            const unanswered = QUESTIONS.length - Object.keys(currentState.userAnswers).length;
+            const textEl = document.getElementById('modal-confirm-text');
+
+            if (unanswered > 0) {
+                textEl.innerHTML = `You still have <strong class="text-rose-600">${unanswered} unanswered question(s)</strong>. Are you sure you want to finish now?`;
+            } else {
+                textEl.innerHTML = `You have answered all 30 questions! Are you ready to submit your assessment?`;
+            }
+
+            document.getElementById('modal-confirm-submit').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm-submit').classList.add('hidden');
+        }
+
+        function executeFinalSubmit() {
+            closeConfirmModal();
+            currentState.isExamActive = false;
+            currentState.examEndTime = new Date();
+            clearInterval(currentState.timerInterval);
+
+            // Calculate Score
+            let correctCount = 0;
+            const wrongQuestionNumbers = [];
+
+            QUESTIONS.forEach((q, idx) => {
+                const userAns = currentState.userAnswers[q.id];
+                if (userAns === q.answerKey) {
+                    correctCount++;
+                } else {
+                    wrongQuestionNumbers.push(idx + 1);
+                }
+            });
+
+            const wrongCount = QUESTIONS.length - correctCount;
+            const finalScore = Math.round((correctCount / QUESTIONS.length) * 100);
+
+            // Calculate Time Taken
+            const diffMs = currentState.examEndTime - currentState.examStartTime;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffSec = Math.floor((diffMs % 60000) / 1000);
+            const timeTakenStr = `${diffMin}m ${diffSec}s`;
+
+            // UI Updates on Result Screen
+            document.getElementById('res-score').textContent = finalScore;
+            document.getElementById('res-correct').textContent = correctCount;
+            document.getElementById('res-wrong').textContent = wrongCount;
+            document.getElementById('res-violations').textContent = currentState.violationsCount;
+
+            document.getElementById('res-student-name').textContent = currentState.studentName;
+            document.getElementById('res-student-class').textContent = currentState.studentClass;
+            document.getElementById('res-time-taken').textContent = timeTakenStr;
+
+            // Result Title Dynamic Styling
+            const iconBox = document.getElementById('result-icon-container');
+            const titleEl = document.getElementById('result-title');
+            if (finalScore >= 80) {
+                iconBox.textContent = "🏆";
+                titleEl.textContent = "Outstanding Work!";
+            } else if (finalScore >= 60) {
+                iconBox.textContent = "🌟";
+                titleEl.textContent = "Good Effort!";
+            } else {
+                iconBox.textContent = "📚";
+                titleEl.textContent = "Keep Practicing!";
+            }
+
+            // Switch Screen
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('header-status-bar').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+
+            // Save summary references
+            currentState.summary = {
+                timestamp: new Date().toLocaleString(),
+                nama: currentState.studentName,
+                kelas: currentState.studentClass,
+                benar: correctCount,
+                salah: wrongCount,
+                skor: finalScore,
+                pelanggaran: currentState.violationsCount,
+                noSoalSalah: wrongQuestionNumbers.length > 0 ? wrongQuestionNumbers.join(', ') : "None"
+            };
+
+            // Post results to Google Apps Script
+            submitResultsToGAS();
+        }
+
+        /* ================= GAS HTTP POST INTEGRATION ================= */
+        function submitResultsToGAS() {
+            const statusCard = document.getElementById('gas-status-card');
+            const statusText = document.getElementById('gas-status-text');
+            const spinner = document.getElementById('gas-spinner');
+            const retryBtn = document.getElementById('gas-retry-btn');
+
+            if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.trim() === "") {
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-amber-500 text-xs font-bold flex items-center justify-between bg-amber-50 text-amber-900";
+                spinner.className = "fa-solid fa-circle-info text-amber-600";
+                statusText.textContent = "Google Sheets sync is disabled (GAS_WEB_APP_URL not configured).";
+                retryBtn.classList.add('hidden');
+                return;
+            }
+
+            statusCard.className = "mb-6 p-3 rounded-xl border-2 border-slate-900 text-xs font-bold flex items-center justify-between bg-blue-50 text-blue-800";
+            spinner.className = "fa-solid fa-spinner fa-spin";
+            statusText.textContent = "Sending results to Google Sheets...";
+            retryBtn.classList.add('hidden');
+
+            // Send payload via fetch POST
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Standard cross-origin setting for GAS Web Apps
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentState.summary)
+            })
+            .then(() => {
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-emerald-500 text-xs font-bold flex items-center justify-between bg-emerald-50 text-emerald-800";
+                spinner.className = "fa-solid fa-circle-check text-emerald-600";
+                statusText.textContent = "Successfully submitted score to Google Sheets!";
+                retryBtn.classList.add('hidden');
+            })
+            .catch(err => {
+                console.error("GAS Submission Error:", err);
+                statusCard.className = "mb-6 p-3 rounded-xl border-2 border-rose-500 text-xs font-bold flex items-center justify-between bg-rose-50 text-rose-800";
+                spinner.className = "fa-solid fa-circle-xmark text-rose-600";
+                statusText.textContent = "Failed to sync with Google Sheets.";
+                retryBtn.classList.remove('hidden');
+            });
+        }
+
+        /* ================= REVIEW MODE ENGINE ================= */
+        function toggleReviewMode() {
+            const panel = document.getElementById('review-panel');
+            const btnText = document.getElementById('btn-review-text');
+
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                btnText.textContent = "Hide Review Panel";
+                renderReviewItems();
+            } else {
+                panel.classList.add('hidden');
+                btnText.textContent = "Review Questions & Answers";
+            }
+        }
+
+        function renderReviewItems() {
+            const container = document.getElementById('review-items-container');
+            container.innerHTML = '';
+
+            QUESTIONS.forEach((q, idx) => {
+                const userAns = currentState.userAnswers[q.id] || "Unanswered";
+                const isCorrect = (userAns === q.answerKey);
+
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border-2 text-xs font-medium space-y-2 ${isCorrect ? 'bg-emerald-50 border-emerald-400' : 'bg-rose-50 border-rose-400'}`;
+
+                let optionsListHtml = '';
+                q.options.forEach(opt => {
+                    let optClass = "p-2 rounded-lg border flex items-center justify-between ";
+                    if (opt.key === q.answerKey) {
+                        optClass += "bg-emerald-200 border-emerald-600 font-bold text-emerald-900";
+                    } else if (opt.key === userAns && !isCorrect) {
+                        optClass += "bg-rose-200 border-rose-600 font-bold text-rose-900";
+                    } else {
+                        optClass += "bg-white border-slate-200 text-slate-700";
+                    }
+
+                    optionsListHtml += `
+                        <div class="${optClass}">
+                            <span><strong>${opt.key}.</strong> ${opt.text}</span>
+                            ${opt.key === q.answerKey ? '<span class="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold">Correct Key</span>' : ''}
+                            ${opt.key === userAns && !isCorrect ? '<span class="text-[10px] bg-rose-600 text-white px-2 py-0.5 rounded-full font-bold">Your Answer</span>' : ''}
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-black text-slate-900 text-sm">Question #${idx + 1} (${q.level})</span>
+                        <span class="px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">
+                            ${isCorrect ? 'Correct (+1)' : 'Incorrect (0)'}
+                        </span>
+                    </div>
+
+                    ${q.passage ? `<div class="bg-white/80 p-2 rounded-lg border border-slate-300 font-mono text-[11px] text-slate-700 whitespace-pre-line">${q.passage}</div>` : ''}
+
+                    <p class="font-bold text-slate-800">${q.prompt}</p>
+
+                    <div class="space-y-1 mt-2">
+                        ${optionsListHtml}
+                    </div>
+
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-300 mt-2 text-slate-700">
+                        <strong class="text-brand-purple"><i class="fa-solid fa-lightbulb mr-1"></i> Explanation:</strong> ${q.explanation}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        /* ================= RESET APP ================= */
+        function resetAppToStart() {
+            currentState.isExamActive = false;
+            clearInterval(currentState.timerInterval);
+            document.getElementById('modal-violation').classList.add('hidden');
+            document.getElementById('modal-confirm-submit').classList.add('hidden');
+            document.getElementById('screen-exam').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('header-status-bar').classList.add('hidden');
+            document.getElementById('screen-welcome').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        }
+
+        /* ================= TEACHER MODAL ================= */
+        function openTeacherModal() {
+            document.getElementById('modal-teacher').classList.remove('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('modal-teacher').classList.add('hidden');
+        }
+
+        function copyGasCode() {
+            const codeText = document.getElementById('gas-script-code').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            alert('Google Apps Script code copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
